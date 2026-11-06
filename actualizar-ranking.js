@@ -38,7 +38,7 @@ for(const p of profiles){
 }
 profiles.sort((a,b)=>b.score-a.score || a.nick.localeCompare(b.nick));
 const oldRows=[...html.matchAll(/<tr class="clk [^"]+" data-p="\d+"[\s\S]*?<\/tr>/g)];
-const avatars={};for(const [row] of oldRows){const m=row.match(/<td class="pl">[\s\S]*?<img src="([^"]+)"[^>]*><strong>([^<]+)<\/strong>/);if(m) avatars[m[2]]=m[1];}
+const avatars={};for(const [row] of oldRows){const m=row.match(/<td class="pl">[\s\S]*?<img src="([^"]+)"[^>]*><strong>([^<]+)<\/strong>/);if(m) avatars[m[2].replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&')]=m[1];}
 const fallback='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#253249"/><circle cx="50" cy="36" r="19" fill="#8fa4bd"/><path d="M15 92c3-25 18-36 35-36s32 11 35 36" fill="#8fa4bd"/></svg>');
 const img=p=>escape(avatars[p.nick] || fallback);
 const n=(v,d=1)=>v===null?'—':v.toFixed(d);
