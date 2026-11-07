@@ -27,7 +27,7 @@ $fCard=[System.Drawing.Font]::new('Arial',25,[System.Drawing.FontStyle]::Bold,[S
 $g.DrawString('COUNTER-STRIKE 2  /  COMUNIDAD', $fSmall,$muted,164,91)
 $g.DrawString('RANKING', $fTitle,$white,68,191)
 $g.DrawString('OBF', $fTitle,$orange,68,282)
-$g.DrawString('Estadísticas, perfiles y divisiones', $fSub,$muted,74,407)
+$g.DrawString('Estadísticas y perfiles de CS2', $fSub,$muted,74,407)
 $g.FillRectangle((Brush '#303846'),74,478,500,2)
 $g.DrawString('COMPITE. MEJORA. SUBE.', $fLabel,$white,74,507)
 $g.DrawString('nomfps.github.io', $fSmall,$dim,74,568)
