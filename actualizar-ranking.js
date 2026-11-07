@@ -5,7 +5,7 @@ const root = __dirname;
 const previousRanks = JSON.parse(fs.readFileSync(path.join(root, 'posiciones-anteriores.json'), 'utf8'));
 const htmlPath = path.join(root, 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
-const lines = fs.readFileSync(path.join(root, 'estadisticas-2026-11-06.txt'), 'utf8').split(/\r?\n/).filter(x => x && !x.startsWith('#'));
+const lines = fs.readFileSync(path.join(root, 'estadisticas-2026-11-07.txt'), 'utf8').split(/\r?\n/).filter(x => x && !x.startsWith('#'));
 const keys = ['aim','utility','position','clutch','opening','kd','leetRating','hs','preaim','ttd','he','accuracy','strafe','kast','win'];
 const trackerKeys = ['trust','trackerKd','adr','hltv','teamDamage'];
 const profiles = lines.map(line => {

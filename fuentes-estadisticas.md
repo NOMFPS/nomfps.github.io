@@ -29,11 +29,11 @@ Consulta los perfiles de CSStats indicados aquí cuando se solicite actualizar e
 
 - Consulta cada perfil y conserva las fuentes y periodos por separado: Leetify, cstracker.gg y FACEIT. No confundas las métricas con el mismo nombre de diferentes proveedores.
 - El HTML contiene los 20 jugadores, incluidos Ecuadorian Toad <3 y 4NDRES.
-- Usa los valores publicados de Leetify, cstracker.gg, rating Premier y ELO de FACEIT; marca como ausentes los valores no disponibles. No inventes estadísticas. El último campo de cada fila de `estadisticas-2026-11-06.txt` es el rating Premier; déjalo vacío si no se muestra.
+- Usa los valores publicados de Leetify, cstracker.gg, rating Premier y ELO de FACEIT; marca como ausentes los valores no disponibles. No inventes estadísticas. El último campo de cada fila de `estadisticas-2026-11-07.txt` es el rating Premier; déjalo vacío si no se muestra.
 - Recalcula el Rating 2.0 estimado, categorías y puntuación OBF según el apartado «Sistema de puntuacion» de `index.html`: Premier pesa 10 % y FACEIT 5 %; el winrate es informativo y no puntúa. Las métricas ausentes no deben tratarse como cero.
 - Actualiza coherentemente las posiciones por estadística, el orden, divisiones, podio, equipos, metadatos, tabla y objetos `PROFILES`; comprueba que cada ficha abra el jugador correcto.
 - El sitio muestra datos de distintos proveedores y ventanas de partidos; registra la fecha de consulta y mantén identificada cada fuente. Si alguna fuente no carga, evita presentar sus datos anteriores como actuales.
 
-Última actualización de estadísticas y ranking: 6 de noviembre de 2026. La instantánea consultada está en `estadisticas-2026-11-06.txt`. Para regenerar el HTML con esa instantánea, ejecuta `node actualizar-ranking.js`; para una actualización futura, consulta primero los enlaces y actualiza la instantánea y la fecha del generador.
+Última actualización de estadísticas y ranking: 7 de noviembre de 2026. La instantánea consultada está en `estadisticas-2026-11-07.txt`. Para regenerar el HTML con esa instantánea, ejecuta `node actualizar-ranking.js`; para una actualización futura, consulta primero los enlaces y actualiza la instantánea y la fecha del generador.
 
 Las variaciones de posición se comparan con `posiciones-anteriores.json`, que conserva el ranking de 18 jugadores anterior a la actualización inicial de los enlaces. Los jugadores ausentes de ese archivo se muestran como nuevos; conserva esa referencia hasta que se solicite cambiarla.
