@@ -27,16 +27,28 @@ const stats = Object.fromEntries(fields.map(k => {
  const sd=Math.sqrt(vals.reduce((a,b)=>a+(b-mean)**2,0)/vals.length); return [k,{mean,sd,vals}];
 }));
 const z = (p,k) => p[k] === null ? null : Math.max(-2.5,Math.min(2.5,(p[k]-stats[k].mean)/(stats[k].sd || 1)*(lower.has(k)?-1:1)));
+// La categoría competitiva usa una única fuente por jugador: FACEIT si existe; si no, Premier.
+// Cada fuente se normaliza por separado, sin mezclar sus escalas.
 const categories = [
- ['Impacto','IMP',.30,[['rating',4],['impact',2],['leetRating',2],['kd',1]]],
- ['Punteria','AIM',.25,[['aim',3],['preaim',2],['ttd',2],['hs',1],['accuracy',1],['strafe',1]]],
- ['Equipo','TEAM',.15,[['kast',3],['utility',2],['he',1],['teamDamage',1]]],
- ['Clutch/Entry','CLU',.15,[['clutch',2],['opening',2],['position',1]]],
- ['Premier','PRE',.10,[['premier',1]]],['FACEIT','ELO',.05,[['elo',1]]]
+ ['Rendimiento','REN',.35,[['leetRating',.20],['adr',.10],['kast',.05]]],
+ ['Resultados','RES',.20,[['win',.10],['competitive',.10]]],
+ ['Mecanica','MEC',.20,[['ttd',.07],['preaim',.05],['strafe',.04],['hs',.04]]],
+ ['Juego colectivo','COL',.15,[['utility',.08],['position',.07]]],
+ ['Momentos decisivos','DEC',.10,[['opening',.05],['clutch',.05]]]
 ];
+const metricZ = (p,k) => k === 'competitive' ? (p.elo !== null ? z(p,'elo') : z(p,'premier')) : z(p,k);
 for(const p of profiles){
- p.cats=categories.map(([, , , components])=>{const v=components.filter(([k])=>z(p,k)!==null);if(!v.length)return null;return Math.max(0,Math.min(100,50+20*v.reduce((s,[k,w])=>s+z(p,k)*w,0)/v.reduce((s,[,w])=>s+w,0)));});
- const avail=categories.map((c,i)=>[c[2],p.cats[i]]).filter(([,v])=>v!==null);p.score=avail.reduce((s,[w,v])=>s+w*v,0)/avail.reduce((s,[w])=>s+w,0);
+ let sum=0, availableWeight=0;
+ p.cats=categories.map(([, , , components])=>{
+  const available=components.map(([k,w])=>[metricZ(p,k),w]).filter(([value])=>value!==null);
+  if(!available.length)return null;
+  const weight=available.reduce((a,[,w])=>a+w,0);
+  const categoryZ=available.reduce((a,[value,w])=>a+value*w,0)/weight;
+  sum += available.reduce((a,[value,w])=>a+(50+20*value)*w,0);
+  availableWeight += weight;
+  return Math.max(0,Math.min(100,50+20*categoryZ));
+ });
+ p.score=availableWeight ? sum/availableWeight : null;
 }
 profiles.sort((a,b)=>b.score-a.score || a.nick.localeCompare(b.nick));
 const oldRows=[...html.matchAll(/<tr class="clk [^"]+" data-p="\d+"[\s\S]*?<\/tr>/g)];
@@ -70,13 +82,14 @@ html=html.replace(/<tbody>[\s\S]*?<\/tbody>/,`<tbody>${profiles.map(row).join('\
 html=html.replace(/<div class="divs">[\s\S]*?<\/div>\s*<p class="note">[\s\S]*?<\/p>/,`<div class="divs">${divisions}</div>\n<p class="note">Fuera de division (puestos 16-20): ${profiles.slice(15).map(p=>`${escape(p.nick)} (#${p.rank}, ${p.score.toFixed(1)})`).join(', ')}.</p>`);
 const publicProfiles=profiles.map(p=>({nick:p.nick,rank:p.rank,score:Number(p.score.toFixed(1)),movement:p.movement,previousRank:p.previousRank,tier:p.tier,div:p.div,bars:p.bars,groups:p.groups,best:p.best,worst:p.worst,url:'https://csst.at/profile/'+p.id}));
 html=html.replace(/const PROFILES = [\s\S]*?;\s*\n\(\(\) => \{/,`const PROFILES = ${JSON.stringify(publicProfiles).replace(/</g,'\\u003c')};\n(() => {`);
-html=html.replace(/18 jugadores · Puntuacion/, '20 jugadores · Datos consultados el 6 de noviembre de 2026 · Puntuacion');
-const desc=`Clasificacion de 20 jugadores de CS2 con Rating 2.0 estimado y puntuacion OBF. Top 3: ${profiles.slice(0,3).map(p=>`${p.nick} (${p.score.toFixed(1)})`).join(', ')}.`;
-html=html.replace(/(content=")Clasificacion de 18 jugadores[^\"]*(")/g,(_,a,b)=>a+escape(desc)+b);
-html=html.replace('<li><strong>Victorias · 10%</strong> — Winrate x1</li>', '<li><strong>Premier · 10%</strong> — Rating Premier x1</li>');
-html=html.replace('Si a un jugador le falta una categoria (sin FACEIT, o Leetify sin clutch/opening/position), su peso se reparte entre las demas para no premiarle ni castigarle.', 'Si a un jugador le falta una categoria (Premier, FACEIT o Leetify sin clutch/opening/position), su peso se reparte proporcionalmente entre las demas. El winrate se muestra como dato informativo y no interviene en la puntuacion.');
-html=html.replace('cada categoria se pasa a una escala 0-100 donde <b>50 = jugador medio del grupo</b>.','cada categoria se pasa a una escala 0-100 con 50 + 20 por desviacion estandar, limitada a 0-100; <b>50 representa la media de cada estadistica</b>.');
-html=html.replace('KPR = ADR / 110 (dano medio por kill), DPR = KPR / KD y APR = 0.12', 'KPR = ADR de cstracker.gg / 110 (dano medio por kill), DPR = KPR / KD de cstracker.gg y APR = 0.12');
+const explanation = `<div class="method">
+<p>La puntuación OBF combina cinco categorías. Cada estadística se compara con los jugadores que tienen datos mediante un z-score limitado a ±2,5 y se convierte a una escala de 0 a 100: 50 + 20 × z. Las ponderaciones de la tabla son puntos porcentuales del total.</p>
+<ul><li><strong>Rendimiento · 35%</strong> — Leetify Rating 20%, ADR de cstracker.gg 10%, KAST de Leetify 5%.</li><li><strong>Resultados · 20%</strong> — Winrate de Leetify 10% y rango competitivo 10%.</li><li><strong>Mecánica · 20%</strong> — Time to damage 7%, Preaim 5%, Counter-strafe 4%, HS kills 4%.</li><li><strong>Juego colectivo · 15%</strong> — Utility 8%, Position 7%.</li><li><strong>Momentos decisivos · 10%</strong> — Opening 5%, Clutch 5%.</li></ul>
+<p><strong>Rango competitivo:</strong> se usa FACEIT si está disponible; si no, Premier. Ambas escalas se normalizan por separado frente a los jugadores con datos de la misma plataforma, y solo una aporta el 10%.</p>
+<p>Si falta una estadística, su peso se reparte proporcionalmente entre todas las estadísticas disponibles del jugador. Los valores ausentes no cuentan como cero; por ello, las puntuaciones con menos datos son menos completas. El winrate vuelve a formar parte del cálculo. Tiers: S ≥ 70 · A ≥ 58 · B ≥ 48 · C ≥ 40 · D &lt; 40.</p>
+<p>El Rating 2.0, Impact, KPR y DPR mostrados en las fichas son estimaciones informativas y no intervienen en la puntuación OBF. La puntuación OBF es propia y no es un rating oficial de HLTV.</p>
+</div>`;
+html=html.replace(/<div class="method">[\s\S]*?<\/div>/,explanation);
 if (!html.includes('Ver fuente de estadísticas en CSStats')) html=html.replace('<div class="pf-grid">', '<p><a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">Ver fuente de estadísticas en CSStats ↗</a></p><div class="pf-grid">');
 fs.writeFileSync(htmlPath,html,'utf8');
 console.log(profiles.map(p=>`${p.rank}. ${p.nick}: ${p.score.toFixed(1)}`).join('\n'));
