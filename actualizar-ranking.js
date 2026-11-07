@@ -4,6 +4,7 @@ const root = __dirname;
 // Posiciones anteriores a la actualización de los enlaces; los jugadores nuevos no tienen posición previa.
 const previousRanks = JSON.parse(fs.readFileSync(path.join(root, 'posiciones-anteriores.json'), 'utf8'));
 const premierHistory = JSON.parse(fs.readFileSync(path.join(root, 'premier-historico.json'), 'utf8'));
+const secondaryAccount = JSON.parse(fs.readFileSync(path.join(root, 'cuenta-secundaria.json'), 'utf8'));
 const htmlPath = path.join(root, 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
 const lines = fs.readFileSync(path.join(root, 'estadisticas-2026-11-07.txt'), 'utf8').split(/\r?\n/).filter(x => x && !x.startsWith('#'));
@@ -91,7 +92,7 @@ html=html.replace(/<div class="podium">[\s\S]*?<\/div>\s*<div class="tablewrap">
 html=html.replace('<th>WR</th><th>ELO</th>', '<th>WR</th><th>Premier</th><th>FACEIT</th>');
 html=html.replace(/<tbody>[\s\S]*?<\/tbody>/,`<tbody>${profiles.map(row).join('\n')}</tbody>`);
 const publicProfiles=profiles.map(p=>({nick:p.nick,rank:p.rank,score:Number(p.score.toFixed(1)),movement:p.movement,previousRank:p.previousRank,tier:p.tier,div:p.div,bars:p.bars,groups:p.groups,best:p.best,worst:p.worst,url:'https://csst.at/profile/'+p.id}));
-html=html.replace(/const PROFILES = [\s\S]*?;\s*\n\(\(\) => \{/,`const PROFILES = ${JSON.stringify(publicProfiles).replace(/</g,'\\u003c')};\n(() => {`);
+html=html.replace(/const PROFILES = [\s\S]*?;\s*(?:const SECONDARY_ACCOUNT = [^\n]*;\s*)?\n?\(\(\) => \{/,`const PROFILES = ${JSON.stringify(publicProfiles).replace(/</g,'\\u003c')};\nconst SECONDARY_ACCOUNT = ${JSON.stringify(secondaryAccount).replace(/</g,'\\u003c')};\n(() => {`);
 const explanation = `<div class="method">
 <p>La puntuación OBF combina cinco categorías. Cada estadística se compara con los jugadores que tienen datos mediante un z-score limitado a ±2,5 y se convierte a una escala de 0 a 100: 50 + 20 × z. Las ponderaciones de la tabla son puntos porcentuales del total.</p>
 <ul><li><strong>Rendimiento · 35%</strong> — Leetify Rating 20%, ADR de cstracker.gg 10%, KAST de Leetify 5%.</li><li><strong>Resultados · 20%</strong> — Winrate de Leetify 10% y rango competitivo 10%.</li><li><strong>Mecánica · 20%</strong> — Time to damage 7%, Preaim 5%, Counter-strafe 4%, HS kills 4%.</li><li><strong>Juego colectivo · 15%</strong> — Utility 8%, Position 7%.</li><li><strong>Momentos decisivos · 10%</strong> — Opening 5%, Clutch 5%.</li></ul>

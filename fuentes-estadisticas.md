@@ -4,7 +4,8 @@ Consulta los perfiles de CSStats indicados aquí cuando se solicite actualizar e
 
 | Jugador en el ranking o nombre consultado | Perfil de CSStats |
 | --- | --- |
-| MigiWR | https://csst.at/profile/MigiWR |
+| MigiWR (cuenta principal, cuenta que puntúa en el ranking) | https://csst.at/profile/MigiWR |
+| NomFPS (cuenta secundaria del mismo jugador; no ocupa otro puesto) | https://csst.at/profile/nomfps |
 | M4rceeX | https://csst.at/profile/76561198337276315 |
 | Fronter | https://csst.at/profile/76561198080215754 |
 | DeadShot | https://csst.at/profile/76561199849098615 |
@@ -40,3 +41,5 @@ Consulta los perfiles de CSStats indicados aquí cuando se solicite actualizar e
 Las variaciones de posición se comparan con `posiciones-anteriores.json`, que conserva el ranking de 18 jugadores anterior a la actualización inicial de los enlaces. Los jugadores ausentes de ese archivo se muestran como nuevos; conserva esa referencia hasta que se solicite cambiarla.
 
 Los rangos de letras se asignan por puntuación OBF: S ≥ 70, A ≥ 60, B ≥ 50, C ≥ 40, D ≥ 30, E ≥ 20 y F < 20. La lista muestra Premier con los colores por intervalo y señala los valores recuperados con su fecha de consulta.
+
+La cuenta secundaria NomFPS está documentada en `cuenta-secundaria.json`: actualiza sus datos desde su enlace al actualizar perfiles. No la agregues como jugador adicional ni la incluyas en el cálculo del ranking; la puntuación y posición de MigiWR corresponden únicamente a su cuenta principal.
