@@ -7,7 +7,8 @@ const premierHistory = JSON.parse(fs.readFileSync(path.join(root, 'premier-histo
 const secondaryAccount = JSON.parse(fs.readFileSync(path.join(root, 'cuenta-secundaria.json'), 'utf8'));
 const htmlPath = path.join(root, 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
-const lines = fs.readFileSync(path.join(root, 'estadisticas-2026-11-07.txt'), 'utf8').split(/\r?\n/).filter(x => x && !x.startsWith('#'));
+html = html.replace(/Datos (?:actualizados|consultados) el .*?\.<br>/, 'Datos consultados el 8 de noviembre de 2026.<br>');
+const lines = fs.readFileSync(path.join(root, 'estadisticas-2026-11-08.txt'), 'utf8').split(/\r?\n/).filter(x => x && !x.startsWith('#'));
 const keys = ['aim','utility','position','clutch','opening','kd','leetRating','hs','preaim','ttd','he','accuracy','strafe','kast','win'];
 const trackerKeys = ['trust','trackerKd','adr','hltv','teamDamage'];
 const profiles = lines.map(line => {
@@ -88,12 +89,13 @@ const row=(p,i)=>`<tr class="clk ${p.div?p.div[2]:'dx'}" data-p="${i}" tabindex=
 
 const podium=[1,0,2].map(i=>{const p=profiles[i];return `<div class="pod clk p${i+1}" data-p="${i}" tabindex="0"><img src="${img(p)}" alt=""><strong>${escape(p.nick)}</strong><small>PUNTUACIÓN OBF</small><b>${p.score.toFixed(1)}</b>${movementHTML(p)}<div class="step">#${p.rank}</div></div>`}).join('');
 
-html=html.replace(/<div class="podium">[\s\S]*?<\/div>\s*<div class="tablewrap">/,`<div class="podium">${podium}</div>\n<div class="list-heading"><div><span class="eyebrow">RANKING OBF</span><h2>Jugadores</h2></div><span class="list-hint">Selecciona un jugador para ver sus estadísticas <span aria-hidden="true">↗</span></span></div>\n<div class="tablewrap">`);
+html=html.replace(/<div class="podium">[\s\S]*?<div class="tablewrap">/,`<div class="podium">${podium}</div>\n<div class="list-heading"><div><span class="eyebrow">RANKING OBF</span><h2>Jugadores</h2></div><span class="list-hint">Selecciona un jugador para ver sus estadísticas <span aria-hidden="true">↗</span></span></div>\n<div class="tablewrap">`);
 html=html.replace('<th>WR</th><th>ELO</th>', '<th>WR</th><th>Premier</th><th>FACEIT</th>');
 html=html.replace(/<tbody>[\s\S]*?<\/tbody>/,`<tbody>${profiles.map(row).join('\n')}</tbody>`);
 const publicProfiles=profiles.map(p=>({nick:p.nick,rank:p.rank,score:Number(p.score.toFixed(1)),movement:p.movement,previousRank:p.previousRank,tier:p.tier,div:p.div,bars:p.bars,groups:p.groups,best:p.best,worst:p.worst,url:'https://csst.at/profile/'+p.id}));
 html=html.replace(/const PROFILES = [\s\S]*?;\s*(?:const SECONDARY_ACCOUNT = [^\n]*;\s*)?\n?\(\(\) => \{/,`const PROFILES = ${JSON.stringify(publicProfiles).replace(/</g,'\\u003c')};\nconst SECONDARY_ACCOUNT = ${JSON.stringify(secondaryAccount).replace(/</g,'\\u003c')};\n(() => {`);
 const explanation = `<div class="method">
+<p>Consulta: 8 de noviembre de 2026. Leetify: últimos 30 partidos. cstracker.gg: 90 partidos, excepto MigiWR (63) y Z3R0taps (6). FACEIT: ELO publicado al consultar; su ventana es independiente.</p>
 <p>La puntuación OBF combina cinco categorías. Cada estadística se compara con los jugadores que tienen datos mediante un z-score limitado a ±2,5 y se convierte a una escala de 0 a 100: 50 + 20 × z. Las ponderaciones de la tabla son puntos porcentuales del total.</p>
 <ul><li><strong>Rendimiento · 35%</strong> — Leetify Rating 20%, ADR de cstracker.gg 10%, KAST de Leetify 5%.</li><li><strong>Resultados · 20%</strong> — Winrate de Leetify 10% y rango competitivo 10%.</li><li><strong>Mecánica · 20%</strong> — Time to damage 7%, Preaim 5%, Counter-strafe 4%, HS kills 4%.</li><li><strong>Juego colectivo · 15%</strong> — Utility 8%, Position 7%.</li><li><strong>Momentos decisivos · 10%</strong> — Opening 5%, Clutch 5%.</li></ul>
 <p><strong>Rango competitivo:</strong> se usa Premier actual o su último valor registrado. Si no hay ningún Premier conocido, se utiliza FACEIT si está disponible. Ambas escalas se normalizan por separado y solo una aporta el 10%. Los valores recuperados se identifican con la fecha de consulta y no representan necesariamente el rango activo.</p>
