@@ -4,6 +4,7 @@ Consulta los perfiles de CSStats indicados aquí cuando se solicite actualizar e
 
 | Jugador en el ranking o nombre consultado | Perfil de CSStats |
 | --- | --- |
+| Skrog ∆. (Steam: Josue06) | https://csst.at/profile/76561198062014243 |
 | JosekL | https://csst.at/profile/76561199650858969 |
 | P0RN_Star (utiliza el mismo avatar que delmito) | https://csst.at/profile/76561199806088701 |
 | MigiWR (cuenta principal, cuenta que puntúa en el ranking) | https://csst.at/profile/MigiWR |
@@ -31,14 +32,14 @@ Consulta los perfiles de CSStats indicados aquí cuando se solicite actualizar e
 ## Instrucciones para la actualización
 
 - Consulta cada perfil y conserva las fuentes y periodos por separado: Leetify, cstracker.gg y FACEIT. No confundas las métricas con el mismo nombre de diferentes proveedores.
-- El HTML contiene 22 jugadores; P0RN_Star utiliza el mismo avatar que delmito.
-- Usa los valores publicados de Leetify, cstracker.gg, rating Premier y ELO de FACEIT; marca como ausentes los valores no disponibles. No inventes estadísticas. El último campo de cada fila de `estadisticas-2026-11-09.txt` es el rating Premier; déjalo vacío si no se muestra.
+- El HTML contiene 23 jugadores; P0RN_Star utiliza el mismo avatar que delmito.
+- Usa los valores publicados de Leetify, cstracker.gg, rating Premier y ELO de FACEIT; marca como ausentes los valores no disponibles. No inventes estadísticas. El último campo de cada fila de `estadisticas-2026-11-11.txt` es el rating Premier; déjalo vacío si no se muestra.
 - Recalcula la puntuación OBF con las cinco categorías: rendimiento 35 % (Leetify Rating 20, ADR de cstracker.gg 10, KAST 5), resultados 20 % (winrate 10, rango competitivo 10), mecánica 20 % (time to damage 7, preaim 5, counter-strafe 4, HS kills 4), juego colectivo 15 % (utility 8, position 7) y momentos decisivos 10 % (opening 5, clutch 5). El Rating 2.0 estimado es informativo y no puntúa.
 - Para el rango competitivo, usa Premier actual; si no aparece, consulta Leetify y utiliza el último valor conocido guardado en `premier-historico.json` con la fuente y fecha de consulta. Solo si no existe ningún dato de Premier, usa FACEIT. Normaliza cada plataforma por separado frente al grupo y usa un solo rango por jugador. Cada métrica ausente incluida en el cálculo aporta 0 puntos a su propio peso; no redistribuyas ese porcentaje ni incorpores el cero como si fuera una observación real al normalizar el grupo.
 - Actualiza coherentemente las posiciones por estadística, el orden, los colores de los grupos de cinco, el podio, la lista y los objetos `PROFILES`; comprueba que cada ficha abra el jugador correcto.
 - El sitio muestra datos de distintos proveedores y ventanas de partidos; registra la fecha de consulta y mantén identificada cada fuente. Si alguna fuente no carga, evita presentar sus datos anteriores como actuales.
 
-Último recálculo del ranking: 9 de noviembre de 2026. Los 20 perfiles anteriores se consultaron el 8 de noviembre; JosekL y P0RN_Star se incorporaron con datos consultados el 9 de noviembre. La instantánea consultada está en `estadisticas-2026-11-09.txt`. Para regenerar el HTML con esa instantánea, ejecuta `node actualizar-ranking.js`; para una actualización futura, consulta primero los enlaces y actualiza la instantánea y la fecha del generador.
+Último recálculo del ranking: 11 de noviembre de 2026. Los 20 perfiles anteriores se consultaron el 8 de noviembre; JosekL y P0RN_Star se incorporaron con datos consultados el 9 de noviembre, y Skrog ∆. se consultó el 11 de noviembre. La instantánea consultada está en `estadisticas-2026-11-11.txt`. Para regenerar el HTML con esa instantánea, ejecuta `node actualizar-ranking.js`; para una actualización futura, consulta primero los enlaces y actualiza la instantánea y la fecha del generador.
 
 Las variaciones comparan el puesto actual con la clasificación inmediatamente anterior en `posiciones-anteriores.json`. Antes de modificar estadísticas, jugadores o fórmula para una nueva actualización, ejecuta `node registrar-posiciones.js` una sola vez para guardar los puestos actuales; después actualiza los datos y regenera el ranking. No ejecutes ese paso al repetir la generación de la misma actualización. Los jugadores sin puesto previo muestran un guion. El archivo `posiciones-iniciales.json` conserva la referencia histórica de 18 jugadores.
 
@@ -51,3 +52,5 @@ Consulta del 8 de noviembre: perfiles verificados en el navegador. Leetify: últ
 Control de datos incompletos: se marcan en rojo los jugadores con dos o más métricas importantes no disponibles (las usadas por la fórmula y Aim). La alerta no demuestra que el perfil sea privado y no implica eliminarlo; los datos ausentes permanecen sin inventar. Revisión del 9 de noviembre: Flys, 4NDRES, Ecuadorian Toad <3, Gift me a glove y P0RN_Star no mostraron Position, Opening ni Clutch en los perfiles públicos revisados de CSStats y Leetify; las demás métricas guardadas sí están disponibles.
 
 Regla de cálculo desde el 9 de noviembre: los pesos originales suman 100 %. Una métrica ausente de la fórmula aporta 0 en su parte; por ejemplo, si faltan Opening y Clutch, Momentos decisivos aporta 0 de su 10 %. Si falta Position, su 7 % aporta 0 mientras Utility conserva su 8 %. Las medias y desviaciones del grupo se calculan solo con valores reales disponibles; no se rellenan con ceros. Aim se vigila para las alertas, pero no forma parte de la fórmula y su ausencia no resta puntos. Tras recalcular, los indicadores de movimiento usan `posiciones-anteriores.json`, guardado antes de comenzar la actualización.
+
+Actualización del 11 de noviembre de 2026: se incorporó Skrog ∆. (SteamID 76561198062014243) con datos consultados en su perfil de CSStats ese día. Los demás perfiles conservan sus fechas anteriores; no se presentan como recién consultados. Los movimientos comparan contra las 22 posiciones anteriores a esta incorporación.

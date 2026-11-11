@@ -7,8 +7,8 @@ const premierHistory = JSON.parse(fs.readFileSync(path.join(root, 'premier-histo
 const secondaryAccount = JSON.parse(fs.readFileSync(path.join(root, 'cuenta-secundaria.json'), 'utf8'));
 const htmlPath = path.join(root, 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
-html = html.replace(/Datos (?:actualizados|consultados) el .*?\.<br>/, 'Datos de 20 jugadores consultados el 8 de noviembre y dos perfiles incorporados el 9 de noviembre de 2026.<br>');
-const lines = fs.readFileSync(path.join(root, 'estadisticas-2026-11-09.txt'), 'utf8').split(/\r?\n/).filter(x => x && !x.startsWith('#'));
+html = html.replace(/Datos .*?\.<br>/, 'Datos de 20 jugadores consultados el 8 de noviembre, dos el 9 de noviembre y Skrog ∆. el 11 de noviembre de 2026.<br>');
+const lines = fs.readFileSync(path.join(root, 'estadisticas-2026-11-11.txt'), 'utf8').split(/\r?\n/).filter(x => x && !x.startsWith('#'));
 const keys = ['aim','utility','position','clutch','opening','kd','leetRating','hs','preaim','ttd','he','accuracy','strafe','kast','win'];
 const trackerKeys = ['trust','trackerKd','adr','hltv','teamDamage'];
 const profiles = lines.map(line => {
@@ -23,7 +23,7 @@ const profiles = lines.map(line => {
   p.rating = [p.kast,p.kpr,p.dpr,p.impact,p.adr].some(v => v === null) ? null : .0073*p.kast + .3591*p.kpr - .5329*p.dpr + .2372*p.impact + .0032*p.adr + .1587;
   return p;
 });
-if (profiles.length !== 22 || profiles.some(p => keys.some(k => p[k] !== null && !Number.isFinite(p[k])))) throw new Error('Datos inválidos');
+if (profiles.length !== 23 || profiles.some(p => keys.some(k => p[k] !== null && !Number.isFinite(p[k])))) throw new Error('Datos inválidos');
 const escape = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const lower = new Set(['dpr','preaim','ttd','teamDamage']);
 const fields = ['rating','impact','kpr','dpr','adr','kast','leetRating','aim','preaim','ttd','hs','accuracy','strafe','utility','he','clutch','opening','position','kd','win','hltv','trackerKd','teamDamage','trust','elo','premier'];
@@ -62,7 +62,7 @@ profiles.sort((a,b)=>b.score-a.score || a.nick.localeCompare(b.nick));
 const oldRows=[...html.matchAll(/<tr class="clk [^"]+" data-p="\d+"[\s\S]*?<\/tr>/g)];
 const avatars={};for(const [row] of oldRows){const m=row.match(/<td class="pl">[\s\S]*?<img src="([^"]+)"[^>]*>[\s\S]*?<strong>([^<]+)<\/strong>/);if(m) avatars[m[2].replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&')]=m[1];}
 const fallback='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#253249"/><circle cx="50" cy="36" r="19" fill="#8fa4bd"/><path d="M15 92c3-25 18-36 35-36s32 11 35 36" fill="#8fa4bd"/></svg>');
-const avatarById = {'76561199650858969':'https://avatars.steamstatic.com/b45e3b350b95f8bda3a34cc0739fbc72ab9a4ed1_full.jpg'};
+const avatarById = {'76561199650858969':'https://avatars.steamstatic.com/b45e3b350b95f8bda3a34cc0739fbc72ab9a4ed1_full.jpg','76561198062014243':'https://avatars.steamstatic.com/4801bb848d1c614a8b11103929d6b600eaf596b0_full.jpg'};
 const img=p=>escape(p.id === '76561199806088701' ? (avatars.delmito || fallback) : (avatars[p.nick] || avatarById[p.id] || fallback));
 const n=(v,d=1)=>v===null?'—':v.toFixed(d);
 const signed=v=>v===null?'—':(v>=0?'+':'')+v.toFixed(1);
